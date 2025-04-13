@@ -18,11 +18,24 @@
   </div>
 
   <div>
-    <button id="mode-button" class="mode-button">Text-to-Speech</button>
 
-    <div id="output">
-      Detected gesture: <span id="gesture">Loading...</span>
+    <button id="mode-button" class="mode-button">Text-to-Speech</button>
+  <div id="output" class="output">
+    
+    <label class="hope" for="myInput">Detected Gesture:</label>
+    <p id="gesture" class="load-text">Loading...</p>
+
+  </div>
+    <div class="input invisible">
+
+      <label for="myInput">Input Phrase or Letters: </label>
+      <div class="box-for-text">
+      <input type="text" id="myInput" class="input-text"  placeholder="Type Here">
+      <button class="trans-button">Translate</button>
     </div>
+
+    </div>
+
   </div>
 
 
