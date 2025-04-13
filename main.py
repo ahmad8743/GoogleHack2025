@@ -138,8 +138,6 @@ def get_prediction_api():
     with prediction_lock:
         prediction = latest_prediction
     return jsonify({'prediction': prediction if prediction is not None else ""})
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
 
 @app.route("/generate", methods=["GET"])
 def generate_endpoint():
@@ -147,3 +145,6 @@ def generate_endpoint():
     result = generate()
     # Return the result as JSON
     return jsonify({"text": result})
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)
