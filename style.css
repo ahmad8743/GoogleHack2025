@@ -1,0 +1,379 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.invisible {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  display: none;
+}
+
+#output.invisible {
+  display: none !important;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #121212;
+  color: #e0e0e0; 
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+  z-index: -1;
+ 
+  /*animation: rotateBackground 30s linear infinite;*/
+}
+
+@keyframes rotateBackground {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem;
+  animation: fadeInDown 1s ease-out;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h1 {
+  font-size: 4em;
+  background: linear-gradient(45deg, #8e9eab, #eef2f3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5em;
+}
+
+p {
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #aaa;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  max-width: 1200px;
+  width: 90%;
+  margin: 0 auto;
+}
+
+/* Main wrapper for side by side layout */
+.main-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Camera container styling */
+#container {
+  position: relative;
+  perspective: 1000px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  width: 1000px;
+}
+
+/* Video and Canvas styling */
+#container video,
+#container canvas {
+  display: block;
+  width: 100%;
+  height: 300px;
+  border-radius: 10px;
+}
+
+/* Side panel styling */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mode-button {
+  background: linear-gradient(135deg, #333, #555);
+  padding: 15px 30px;
+  font-size: 1.2em;
+  color: #e0e0e0;
+  border: none;
+  border-radius: 50px;
+  display: block;
+  margin: 0 auto;
+  margin-top: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  /* Ensure a higher stacking context */
+  z-index: 1;
+}
+
+.mode-button::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 10%, transparent 10.01%);
+  background-size: 10px 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  /* Place the pseudo-element behind the button’s content */
+  z-index: -1;
+}
+
+#mode-button::before {
+  cursor:pointer;
+}
+
+.mode-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+
+}
+
+.mode-button:active {
+  transform: scale(0.98);
+}
+
+.mode-button:hover::before {
+  opacity: 1;
+}
+
+.play-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 10%, transparent 10.01%);
+  background-size: 9px 9px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.play-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+}
+
+.play-button:active {
+  transform: scale(0.98);
+}
+
+.play-button:hover::before {
+  opacity: 1;
+}
+
+/* Output styling */
+#output {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.7);
+  color: #e0e0e0;
+  font-size: 1.3em;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  margin: 20px auto;
+  width: 500px;
+  height: 175px;
+}
+
+/* Input container styling */
+.input {
+  background: rgba(0, 0, 0, 0.7);
+  color: #e0e0e0;
+  font-size: 1.3em;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  margin: 20px auto;
+  width: 500px;
+  height: 175px;
+}
+
+/* Translate button styling */
+.trans-button {
+  background: linear-gradient(135deg, #333, #555);
+  padding: 15px;
+  font-size: 1em;
+  color: #e0e0e0;
+  border: none;
+  border-radius: 50px;
+  display: block;
+  margin: 0 auto;
+  margin-left: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.box-for-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trans-button::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 10%, transparent 10.01%);
+  background-size: 10px 10px;
+  opacity: 0;
+  transition: opacity 0.3s;
+
+}
+
+.trans-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+}
+
+.trans-button:active {
+  transform: scale(0.98);
+}
+
+.trans-button:hover::before {
+  opacity: 1;
+}
+
+.load-text,
+.input-text {
+  background: rgba(0, 0, 0, 0.7);
+  color: #e0e0e0;
+  font-size: 1.3em;
+  padding: 20px;
+  border: none;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+  margin: 20px auto;
+  max-width: 750px;
+}
+
+.input-text::placeholder {
+  color: #aaa;
+  font-size: 1em;
+}
+
+#output span {
+  font-weight: bold;
+  color: #00c6ff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+/*
+footer {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 0.9em;
+  color: #777;
+  animation: fadeInUp 1s ease-out;
+}
+*/
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Style for the new Play button */
+.play-button {
+ background: linear-gradient(135deg, #333, #555);
+  padding: 15px 30px;
+  font-size: 1.2em;
+  color: #e0e0e0;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+  margin-top: 10px;
+}
+
+.play-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+}
+
+.play-button:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 728px) {
+  h1 {
+    font-size: 3em;
+  }
+  p {
+    font-size: 1.2em;
+  }
+  .mode-button, .play-button {
+    font-size: 1em;
+    padding: 12px 24px;
+  }
+  #output {
+    font-size: 1em;
+    padding: 15px;
+  }
+}

@@ -3,98 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <title>ASL Translator Landing Page</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 0; background: #f5f5f5; }
-    h1 { margin-top: 20px; }
-    #video, #canvas { border: 1px solid #ddd; border-radius: 5px; }
-    #video { transform: scaleX(-1); /* Mirror the video for natural interaction */ }
-    #container { position: relative; display: inline-block; }
-    #canvas { position: absolute; left: 0; top: 0; }
-    #output { margin-top: 10px; font-size: 1.2em; }
-  </style>
-  <!-- Load TensorFlow.js -->
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0"></script>
-  <!-- Load TensorFlow Handpose Model -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
-  <!-- Optionally, Fingerpose for gesture recognition could be loaded here -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/fingerpose"></script> -->
 </head>
 <body>
   <h1>ASL Translator</h1>
   <p>Show your hand gestures in front of the camera to see the translated letter or sentence.</p>
+  <p>Click the button to translate text into ASL</p>
 
-  <div id="container">
-    <video id="video" autoplay playsinline width="640" height="480"></video>
-    <canvas id="canvas" width="640" height="480"></canvas>
+  <div class="main-wrapper">
+    
+    <div id="container">
+      <video id="video" autoplay playsinline width="640" height="480"></video>
+      <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+
+  
+    <div class="side-panel">
+      <button id="mode-button" class="mode-button">Text-to-Speech</button>
+      <div id="output" class="output">
+        <label class="hope" for="myInput">Detected Gesture:</label>
+        <p id="gesture" class="load-text">Loading...</p>
+      </div>
+      <div class="input invisible">
+        <label for="myInput">Input Phrase or Letters: </label>
+        <div class="box-for-text">
+          <input type="text" id="myInput" class="input-text" placeholder="Type Here">
+          <button class="trans-button">Translate</button>
+        </div>
+      </div>
+
+      
+      <button id="play-button" class="play-button">Play Sound</button>
+    
+      <audio id="audio" src="output.mp3"></audio>
+    </div>
   </div>
 
-  <div id="output">
-    Detected gesture: <span id="gesture">Loading...</span>
-  </div>
-
+  <script src="./js/index.js"></script>
+  <script src="./js/video.js"></script>
+  <script type="module" src="./js/script.js"></script>
   <script>
-    // Get references to DOM elements
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const gestureOutput = document.getElementById('gesture');
-    let model;
 
-    // Set up the camera using getUserMedia
-    async function setupCamera() {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }});
-        video.srcObject = stream;
-        return new Promise(resolve => {
-          video.onloadedmetadata = () => { resolve(video); };
-        });
-      } else {
-        alert("Your browser does not support access to the camera.");
-      }
-    }
-
-    // Load the Handpose model
-    async function loadModel() {
-      model = await handpose.load();
-      console.log("Handpose model loaded.");
-    }
-
-    // Process each video frame
-    async function detectHands() {
-      const predictions = await model.estimateHands(video);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (predictions.length > 0) {
-        predictions.forEach(prediction => {
-          // Draw landmarks for each detected hand
-          const landmarks = prediction.landmarks;
-          landmarks.forEach(point => {
-            const [x, y] = point;
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = "red";
-            ctx.fill();
-          });
-        });
-
-        // Placeholder logic: If at least one hand is detected, output "A"
-        // In a real application, you'd pass "predictions" to your gesture classifier here.
-        gestureOutput.innerText = "A (dummy result)";
-      } else {
-        gestureOutput.innerText = "No hand detected";
-      }
-      requestAnimationFrame(detectHands);
-    }
-
-    // Main function to initialize everything
-    async function main() {
-      await setupCamera();
-      video.play();
-      await loadModel();
-      detectHands();
-    }
-
-    main();
+    document.getElementById('play-button').addEventListener('click', function() {
+      const audio = document.getElementById('audio');
+      audio.play();
+    });
   </script>
 </body>
 </html>
