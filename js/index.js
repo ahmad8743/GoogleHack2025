@@ -20,4 +20,13 @@ button.addEventListener('click', () => {
   }
 });
 
-
+setInterval(function() {
+    fetch('http://127.0.0.1:5001/get_prediction')
+        .then(response => response.json())
+        .then(data => {
+            console.clear()
+            console.log("Latest prediction:", data.prediction);
+            // Update your webpage with the new prediction here.
+        })
+        .catch(err => console.error('Error fetching prediction', err));
+}, 2000);  // Polling every 2000 milliseconds (2 seconds)
