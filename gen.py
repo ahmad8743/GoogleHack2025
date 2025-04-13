@@ -27,4 +27,3 @@ def generate():
         image = Image.open(BytesIO((part.inline_data.data)))
         image.save('gemini-native-image.png')
         image.show()
-
