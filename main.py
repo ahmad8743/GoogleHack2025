@@ -105,7 +105,8 @@ def generate_frames():
                     mp_drawing.draw_landmarks(
                         output_image, hand_landmarks, mp_hands.HAND_CONNECTIONS
                     )
-
+            else:
+                latest_prediction = None
             ret, buffer = cv2.imencode('.jpg', output_image)
             if not ret:
                 continue
@@ -135,7 +136,7 @@ def get_prediction_api():
     """Endpoint to return the latest prediction."""
     with prediction_lock:
         prediction = latest_prediction
-    return jsonify({'prediction': prediction})
+    return jsonify({'prediction': prediction if prediction is not None else ""})
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
 
