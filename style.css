@@ -163,10 +163,14 @@ p {
   z-index: -1;
 }
 
+#mode-button::before {
+  cursor:pointer;
+}
+
 .mode-button:hover {
   transform: scale(1.05);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
-  cursor: pointer; /* Redundant, but explicit */
+
 }
 
 .mode-button:active {
