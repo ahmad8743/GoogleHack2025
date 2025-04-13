@@ -9,15 +9,13 @@ from flask import Flask, render_template, Response, jsonify, request
 import threading
 import gc
 from flask_cors import CORS
-import creds
+from gen import generate
 app = Flask(__name__)
 CORS(app)
 
 # Initialize MediaPipe Hands and drawing utilities.
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
-
-url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={creds.API_KEY}"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = HandModelNN(input_dim=63, num_classes=NUM_CLASSES)
@@ -143,4 +141,9 @@ def get_prediction_api():
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
 
-
+@app.route("/generate", methods=["GET"])
+def generate_endpoint():
+    # Call the Python function
+    result = generate()
+    # Return the result as JSON
+    return jsonify({"text": result})
