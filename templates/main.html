@@ -9,8 +9,8 @@
 </head>
 <body>
   <h1>ASL Translator</h1>
-  <p>Show your hand gestures in front of the camera to see the translated letter or sentence.</p>
-  <p>Click the button to translate text into ASL</p>
+  <!-- <p>Show your hand gestures in front of the camera to see the translated letter or sentence.</p>
+  <p>Click the button to translate text into ASL</p> -->
 
   <div class="main-wrapper">
     
@@ -26,11 +26,10 @@
         <p id="gesture" class="load-text">Loading...</p>
       </div>
       <div class="input invisible">
-        <label for="myInput">Input Phrase or Letters: </label>
-        <div class="box-for-text">
-          <input type="text" id="myInput" class="input-text" placeholder="Type Here">
-          <button class="trans-button">Translate</button>
-        </div>
+        <label for="myInput">Translate the following sentence</label>
+      
+          <p class="sentence-text">Loading...</p>
+      
       </div>
 
       
@@ -57,8 +56,10 @@
   
   <div class="directions-box">
     <h3>📷 Show Your Hand</h3>
-    <p>Hold one hand up in front of your webcam and make an ASL sign for any letter (A–Z) or number (0–9).</p>
-
+    <ul>
+      <li style="color: white;">Hold one hand up in front of your webcam and make an ASL sign for any letter (A–Z) or number (0–9).</li>
+    </ul>
+    
     <h3>🧭 Choose a Mode</h3>
     <ul>
       <li><strong>Translation Mode:</strong> Instantly converts your hand gesture into text.</li>
@@ -66,7 +67,10 @@
     </ul>
 
     <h3>🔊 Audio Output</h3>
-    <p>When text appears, click <strong>Play Sound</strong> to hear it read aloud.</p>
+    <ul>
+      <li style="color: white;">When text appears, click <strong>Play Sound</strong> to hear it read aloud.</li>
+    </ul>
+    
   </div>
 </div>
 </html>

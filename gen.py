@@ -1,29 +1,10 @@
 import creds
-from google import genai
-from google.genai import types
-from PIL import Image
-from io import BytesIO
-import base64
-
+import google.generativeai as genai
 def generate():
-    client = genai.Client(
-        api_key=creds.API_KEY
-    )
+  genai.configure(api_key=creds.API_KEY)
 
-    contents = ('generate a comic panel of a dolphin fighting a evil fish, make the dialogue english')
+  model = genai.GenerativeModel(model_name="gemini-2.0-flash")
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-exp-image-generation",
-        contents=contents,
-        config=types.GenerateContentConfig(
-          response_modalities=['Text', 'Image']
-        )
-    )
+  response = model.generate_content("Generate a random sentence with 3 to 4 words.")
 
-    for part in response.candidates[0].content.parts:
-      if part.text is not None:
-        print(part.text)
-      elif part.inline_data is not None:
-        image = Image.open(BytesIO((part.inline_data.data)))
-        image.save('gemini-native-image.png')
-        image.show()
+  return response.text

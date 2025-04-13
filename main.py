@@ -9,6 +9,7 @@ from flask import Flask, render_template, Response, jsonify
 import threading
 import gc
 from flask_cors import CORS
+from gen import generate
 app = Flask(__name__)
 CORS(app)
 
@@ -139,4 +140,9 @@ def get_prediction_api():
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
 
-
+@app.route("/generate", methods=["GET"])
+def generate_endpoint():
+    # Call the Python function
+    result = generate()
+    # Return the result as JSON
+    return jsonify({"text": result})
