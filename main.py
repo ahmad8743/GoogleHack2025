@@ -5,16 +5,16 @@ import torch
 import json
 from asl_hand_model.enums import NUM_CLASSES
 from hand_model_trainer import flatten_landmarks_2
-from flask import Flask, render_template, Response
-
+from flask import Flask, render_template, Response, jsonify
+import threading
+import gc
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 # Initialize MediaPipe Hands and drawing utilities.
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
-
-# Open video capture (webcam).
-cap = cv2.VideoCapture(0)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = HandModelNN(input_dim=63, num_classes=NUM_CLASSES)
@@ -24,9 +24,12 @@ model.eval()
 with open('labels.json', 'r') as f:
     labels = json.load(f)
 
+latest_prediction = None
+prediction_lock = threading.Lock()
 crop_size = 600
 
 def generate_frames():
+    global latest_prediction
     cap = cv2.VideoCapture(0)
     # Set up the MediaPipe Hands solution.
     with mp_hands.Hands(
@@ -40,9 +43,19 @@ def generate_frames():
             if not ret:
                 break
 
+            h_frame, w_frame, _ = frame.shape
+            # Ensure the frame is large enough to extract a 600x600 crop.
+            if w_frame >= crop_size and h_frame >= crop_size:
+                # Calculate the coordinates to crop the center.
+                x_start = (w_frame - crop_size) // 2
+                y_start = (h_frame - crop_size) // 2
+                # Crop the center 600x600 region.
+                frame = frame[y_start:y_start + crop_size, x_start:x_start + crop_size]
+            else:
+                # Optionally handle cases where the frame is too small.
+                # For now, we'll just resize (or you could continue without cropping).
+                frame = cv2.resize(frame, (crop_size, crop_size))
 
-
-            # Convert the BGR image to RGB for MediaPipe.
             image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             # Process the image to detect hands.
             results = hands.process(image_rgb)
@@ -65,6 +78,9 @@ def generate_frames():
                     with torch.no_grad():
                         logits = model(input_tensor)
                         prediction = torch.argmax(logits, dim=1).item()
+
+                    with prediction_lock:
+                        latest_prediction = labels[prediction]
 
                     # Calculate bounding box coordinates based on landmarks.
                     xs = [pt[0] for pt in landmark_points]
@@ -90,34 +106,18 @@ def generate_frames():
                         output_image, hand_landmarks, mp_hands.HAND_CONNECTIONS
                     )
 
-                    height, width, _ = output_image.shape
-                    # Determine the center of the frame.
-                    center_x = width // 2
-                    center_y = height // 2
-                    half_crop = crop_size / 2  # half of 600
+            ret, buffer = cv2.imencode('.jpg', output_image)
+            if not ret:
+                continue
+            frame_bytes = buffer.tobytes()
 
-                    # Calculate boundaries ensuring we don't exceed image dimensions.
-                    x1 = int(max(center_x - half_crop, 0))
-                    x2 = int(min(center_x + half_crop, width))
-                    y1 = int(max(center_y - half_crop, 0))
-                    y2 = int(min(center_y + half_crop, height))
-
-                    # Crop the image.
-                    cropped_output = output_image[y1:y2, x1:x2]
-
-                    ret, buffer = cv2.imencode('.jpg', cropped_output)
-                    if not ret:
-                        continue
-                    frame_bytes = buffer.tobytes()
-
-                    yield (b'--frame\r\n'
-                           b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-
-            #cv2.imshow("Hand Detection", output_image)
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
             # Break loop with 'q'
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+            gc.collect()
     cap.release()
 
 @app.route('/')
@@ -130,7 +130,12 @@ def video_feed():
     # Return the streaming response.
     return Response(generate_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-
+@app.route('/get_prediction')
+def get_prediction_api():
+    """Endpoint to return the latest prediction."""
+    with prediction_lock:
+        prediction = latest_prediction
+    return jsonify({'prediction': prediction})
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
 
