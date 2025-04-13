@@ -5,16 +5,19 @@ import torch
 import json
 from asl_hand_model.enums import NUM_CLASSES
 from hand_model_trainer import flatten_landmarks_2
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, request
 import threading
 import gc
 from flask_cors import CORS
+import creds
 app = Flask(__name__)
 CORS(app)
 
 # Initialize MediaPipe Hands and drawing utilities.
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
+
+url = f"https://texttospeech.googleapis.com/v1/text:synthesize?key={creds.API_KEY}"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = HandModelNN(input_dim=63, num_classes=NUM_CLASSES)
