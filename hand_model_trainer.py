@@ -5,10 +5,10 @@ from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import DataLoader, Dataset
 import torch.nn as nn
-from enums import NUM_CLASSES
+#from enums import NUM_CLASSES
 
 def main():
-    data = pd.read_pickle('hand_landmarks.pkl.gz')
+    data = pd.read_pickle('asl_hand_model/hand_landmarks.pkl.gz')
     X = np.stack(data['landmarks'].apply(flatten_landmarks))
     y = data['class'].astype('category').cat.codes.values
     labels = data['class'].astype('category').cat.categories.to_list()
@@ -19,15 +19,15 @@ def main():
     train_dataset = HandLandmarkDataset(X_train, y_train)
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-    model = HandModelNN(input_dim=63, num_classes=NUM_CLASSES)
+    model = HandModelNN(input_dim=63, num_classes=36)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_model(model, train_loader, criterion, optimizer, device, epochs=10000)
+    train_model(model, train_loader, criterion, optimizer, device, epochs=2000)
 
     test_dataset = HandLandmarkDataset(X_test, y_test)
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     evaluate_model(model, test_loader, device)
 
     torch.save(model.state_dict(), 'model.pth')
@@ -44,7 +44,7 @@ class HandLandmarkDataset(Dataset):
         return self.x[idx], self.y[idx]
 
 class HandModelNN(nn.Module):
-    def __init__(self, input_dim=63, num_classes=NUM_CLASSES):
+    def __init__(self, input_dim=63, num_classes=36):
         super(HandModelNN, self).__init__()
         self.model = nn.Sequential(
             nn.Linear(input_dim, 128),

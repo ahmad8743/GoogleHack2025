@@ -15,8 +15,7 @@
   <div class="main-wrapper">
     
     <div id="container">
-      <video id="video" autoplay playsinline width="640" height="480"></video>
-      <canvas id="canvas" width="640" height="480"></canvas>
+      <img id="video" src="http://127.0.0.1:5001/video_feed" width="600" height="600" alt="Video Feed">
     </div>
 
   
@@ -37,13 +36,13 @@
       
       <button id="play-button" class="play-button">Play Sound</button>
     
-      <audio id="audio" src="output.mp3"></audio>
+      <audio id="audio" src="../output.mp3"></audio>
     </div>
   </div>
 
-  <script src="./js/index.js"></script>
-  <script src="./js/video.js"></script>
-  <script type="module" src="./js/script.js"></script>
+  <script src="../js/index.js"></script>
+  <script src="../js/video.js"></script>
+  <script type="module" src="../js/script.js"></script>
   <script>
 
     document.getElementById('play-button').addEventListener('click', function() {
