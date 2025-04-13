@@ -83,15 +83,6 @@ p {
   color: #aaa;
 }
 
-.container {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  max-width: 1200px;
-  width: 90%;
-  margin: 0 auto;
-}
-
 /* Main wrapper for side by side layout */
 .main-wrapper {
   display: flex;
@@ -110,7 +101,7 @@ p {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  width: 1000px;
+  width: 600px;
 }
 
 /* Video and Canvas styling */
